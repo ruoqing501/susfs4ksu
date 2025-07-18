@@ -102,7 +102,7 @@ index 1c46b79ea152..b4d80e1c2cde 100644
  	 * We move the actual failure in case of RLIMIT_NPROC excess from
  	 * set*uid() to execve() because too many poorly written programs
 diff --git a/fs/namei.c b/fs/namei.c
-index caffe417b931..ce387e74f880 100644
+index caffe417b931..e458eae786c0 100644
 --- a/fs/namei.c
 +++ b/fs/namei.c
 @@ -41,10 +41,22 @@
@@ -397,7 +397,7 @@ index caffe417b931..ce387e74f880 100644
  	if (unlikely(filp == ERR_PTR(-ESTALE)))
  		filp = path_openat(&nd, op, flags | LOOKUP_REVAL);
 +#ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-+	if (!IS_ERR(filp) && unlikely(filp->f_inode->i_state & INODE_STATE_OPEN_REDIRECT) && current_uid().val < 2000) {
++	if (!IS_ERR(filp) && unlikely(filp->f_inode->i_mapping->flags & BIT_OPEN_REDIRECT) && current_uid().val < 2000) {
 +		fake_pathname = susfs_get_redirected_path(filp->f_inode->i_ino);
 +		if (!IS_ERR(fake_pathname)) {
 +			restore_nameidata();
@@ -1111,7 +1111,7 @@ index 08d502aae6f9..7b6cb9a56aae 100644
 +}
 +#endif
 diff --git a/fs/notify/fdinfo.c b/fs/notify/fdinfo.c
-index 5c430736ec12..915bba9acf6d 100644
+index 5c430736ec12..0a8bb91b1f73 100644
 --- a/fs/notify/fdinfo.c
 +++ b/fs/notify/fdinfo.c
 @@ -12,6 +12,9 @@
@@ -1170,7 +1170,7 @@ index 5c430736ec12..915bba9acf6d 100644
  	if (inode) {
 +#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 +		if (likely(susfs_is_current_non_root_user_app_proc()) &&
-+				unlikely(inode->i_state & INODE_STATE_SUS_KSTAT)) {
++				unlikely(inode->i_mapping->flags & BIT_SUS_KSTAT)) {
 +			struct path path;
 +			char *pathname = kmalloc(PAGE_SIZE, GFP_KERNEL);
 +			char *dpath;
@@ -1347,7 +1347,7 @@ index 4297287f6ca0..05500a675cbf 100644
  	show_fd_locks(m, file, files);
  	if (seq_has_overflowed(m))
 diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-index f70d8709cc4b..191491362056 100644
+index f70d8709cc4b..979b1dbe0d37 100644
 --- a/fs/proc/task_mmu.c
 +++ b/fs/proc/task_mmu.c
 @@ -23,6 +23,9 @@
@@ -1376,7 +1376,7 @@ index f70d8709cc4b..191491362056 100644
  	if (file) {
  		struct inode *inode = file_inode(vma->vm_file);
 +#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-+		if (unlikely(inode->i_state & INODE_STATE_SUS_KSTAT)) {
++		if (unlikely(inode->i_mapping->flags & BIT_SUS_KSTAT)) {
 +			susfs_sus_ino_for_show_map_vma(inode->i_ino, &dev, &ino);
 +			goto bypass_orig_flow;
 +		}
@@ -1917,7 +1917,7 @@ index c8c46e294431..121909714b15 100644
  	if (error >= 0)
  		error = buf.error;
 diff --git a/fs/stat.c b/fs/stat.c
-index 517fa4ed885e..03410c2830a3 100644
+index 517fa4ed885e..c3aaf319068e 100644
 --- a/fs/stat.c
 +++ b/fs/stat.c
 @@ -20,12 +20,19 @@
@@ -1946,7 +1946,7 @@ index 517fa4ed885e..03410c2830a3 100644
  
 +#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 +	if (likely(susfs_is_current_non_root_user_app_proc()) &&
-+	    unlikely(inode->i_state & INODE_STATE_SUS_KSTAT))
++	    unlikely(inode->i_mapping->flags & BIT_SUS_KSTAT))
 +	{
 +		susfs_sus_ino_for_generic_fillattr(inode->i_ino, stat);
 +		stat->mode = inode->i_mode;
@@ -2024,7 +2024,7 @@ index 517fa4ed885e..03410c2830a3 100644
  	putname(name);
  
 diff --git a/fs/statfs.c b/fs/statfs.c
-index 2a37f9f3dba1..af5e5a6ca44c 100644
+index 2a37f9f3dba1..c766a05d4c9c 100644
 --- a/fs/statfs.c
 +++ b/fs/statfs.c
 @@ -9,6 +9,10 @@
@@ -2067,7 +2067,7 @@ index 2a37f9f3dba1..af5e5a6ca44c 100644
  		return -EINVAL;
  
 +#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-+	if (unlikely(s->s_root->d_inode->i_state & INODE_STATE_SUS_MOUNT)) {
++	if (unlikely(s->s_root->d_inode->i_mapping->flags & BIT_SUS_MOUNT)) {
 +		return -EINVAL;
 +	}
 +#endif
