@@ -1,3 +1,4 @@
+
 diff --git a/fs/Makefile b/fs/Makefile
 index c6963a9a4d0a..e27ac368bbb4 100644
 --- a/fs/Makefile
@@ -55,7 +56,7 @@ index 299c295a27a0..6db4a6ac6c59 100644
  		return NULL;
  	return dentry->d_fsdata;
 diff --git a/fs/exec.c b/fs/exec.c
-index 1c46b79ea152..b4d80e1c2cde 100644
+index cf487b0e49dd..3130a46aa4d5 100644
 --- a/fs/exec.c
 +++ b/fs/exec.c
 @@ -69,6 +69,9 @@
@@ -68,7 +69,7 @@ index 1c46b79ea152..b4d80e1c2cde 100644
  #include <asm/mmu_context.h>
  #include <asm/tlb.h>
  
-@@ -1898,6 +1901,13 @@ static int bprm_execve(struct linux_binprm *bprm,
+@@ -1901,6 +1904,13 @@ static int bprm_execve(struct linux_binprm *bprm,
  	return retval;
  }
  
@@ -82,7 +83,7 @@ index 1c46b79ea152..b4d80e1c2cde 100644
  static int do_execveat_common(int fd, struct filename *filename,
  			      struct user_arg_ptr argv,
  			      struct user_arg_ptr envp,
-@@ -1909,6 +1919,18 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -1912,6 +1922,18 @@ static int do_execveat_common(int fd, struct filename *filename,
  	if (IS_ERR(filename))
  		return PTR_ERR(filename);
  
@@ -102,7 +103,7 @@ index 1c46b79ea152..b4d80e1c2cde 100644
  	 * We move the actual failure in case of RLIMIT_NPROC excess from
  	 * set*uid() to execve() because too many poorly written programs
 diff --git a/fs/namei.c b/fs/namei.c
-index caffe417b931..e458eae786c0 100644
+index 5f45d9b2f84d..7bbc0b94067f 100644
 --- a/fs/namei.c
 +++ b/fs/namei.c
 @@ -41,10 +41,22 @@
@@ -640,7 +641,7 @@ index caffe417b931..e458eae786c0 100644
  	if (IS_ERR(new_dentry))
  		goto exit4;
 diff --git a/fs/namespace.c b/fs/namespace.c
-index 08d502aae6f9..14ea2d96d200 100644
+index 2d0231797d0d..b8d7791922a4 100644
 --- a/fs/namespace.c
 +++ b/fs/namespace.c
 @@ -32,12 +32,38 @@
@@ -797,7 +798,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  		if (err)
  			goto out_free_cache;
  
-@@ -1085,11 +1183,26 @@ static struct mount *skip_mnt_tree(struct mount *p)
+@@ -1081,11 +1179,26 @@ static struct mount *skip_mnt_tree(struct mount *p)
  struct vfsmount *vfs_create_mount(struct fs_context *fc)
  {
  	struct mount *mnt;
@@ -824,7 +825,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	if (!mnt)
  		return ERR_PTR(-ENOMEM);
  
-@@ -1102,6 +1215,27 @@ struct vfsmount *vfs_create_mount(struct fs_context *fc)
+@@ -1098,6 +1211,27 @@ struct vfsmount *vfs_create_mount(struct fs_context *fc)
  	mnt->mnt_mountpoint	= mnt->mnt.mnt_root;
  	mnt->mnt_parent		= mnt;
  
@@ -852,7 +853,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	lock_mount_hash();
  	list_add_tail(&mnt->mnt_instance, &mnt->mnt.mnt_sb->s_mounts);
  	unlock_mount_hash();
-@@ -1171,8 +1305,47 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
+@@ -1167,8 +1301,47 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
  	struct super_block *sb = old->mnt.mnt_sb;
  	struct mount *mnt;
  	int err;
@@ -901,7 +902,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	if (!mnt)
  		return ERR_PTR(-ENOMEM);
  
-@@ -1197,6 +1370,30 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
+@@ -1193,6 +1366,30 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
  	mnt->mnt.mnt_root = dget(root);
  	mnt->mnt_mountpoint = mnt->mnt.mnt_root;
  	mnt->mnt_parent = mnt;
@@ -932,7 +933,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	lock_mount_hash();
  	list_add_tail(&mnt->mnt_instance, &sb->s_mounts);
  	unlock_mount_hash();
-@@ -1971,6 +2168,9 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
+@@ -1969,6 +2166,9 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
  					int flag)
  {
  	struct mount *res, *p, *q, *r, *parent;
@@ -942,7 +943,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  
  	if (!(flag & CL_COPY_UNBINDABLE) && IS_MNT_UNBINDABLE(mnt))
  		return ERR_PTR(-EINVAL);
-@@ -1987,6 +2187,9 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
+@@ -1985,6 +2185,9 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
  	p = mnt;
  	list_for_each_entry(r, &mnt->mnt_mounts, mnt_child) {
  		struct mount *s;
@@ -952,7 +953,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  		if (!is_subdir(r->mnt_mountpoint, dentry))
  			continue;
  
-@@ -2016,6 +2219,14 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
+@@ -2014,6 +2217,14 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
  			q = clone_mnt(p, p->mnt.mnt_root, flag);
  			if (IS_ERR(q))
  				goto out;
@@ -967,7 +968,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  			lock_mount_hash();
  			list_add_tail(&q->mnt_list, &res->mnt_list);
  			attach_mnt(q, parent, p->mnt_mp, false);
-@@ -2641,6 +2852,27 @@ static int do_loopback(struct path *path, const char *old_name,
+@@ -2646,6 +2857,27 @@ static int do_loopback(struct path *path, const char *old_name,
  		umount_tree(mnt, UMOUNT_SYNC);
  		unlock_mount_hash();
  	}
@@ -995,7 +996,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  out2:
  	unlock_mount(mp);
  out:
-@@ -3774,6 +4006,10 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
+@@ -3786,6 +4018,10 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  	struct mount *old;
  	struct mount *new;
  	int copy_flags;
@@ -1006,7 +1007,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  
  	BUG_ON(!ns);
  
-@@ -3793,6 +4029,11 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
+@@ -3805,6 +4041,11 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  	copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;
  	if (user_ns != ns->user_ns)
  		copy_flags |= CL_SHARED_TO_SLAVE;
@@ -1018,7 +1019,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	new = copy_tree(old, old->mnt.mnt_root, copy_flags);
  	if (IS_ERR(new)) {
  		namespace_unlock();
-@@ -3814,6 +4055,12 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
+@@ -3826,6 +4067,12 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  	 */
  	p = old;
  	q = new;
@@ -1031,7 +1032,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	while (p) {
  		q->mnt_ns = new_ns;
  		new_ns->mounts++;
-@@ -3831,6 +4078,15 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
+@@ -3843,6 +4090,15 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
  		q = next_mnt(q, new);
  		if (!q)
  			break;
@@ -1047,7 +1048,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  		// an mntns binding we'd skipped?
  		while (p->mnt.mnt_root != q->mnt.mnt_root)
  			p = next_mnt(skip_mnt_tree(p), old);
-@@ -3907,6 +4163,13 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
+@@ -3919,6 +4175,13 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
  
  	ret = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
  
@@ -1061,7 +1062,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	kfree(options);
  out_data:
  	kfree(kernel_dev);
-@@ -4134,6 +4397,13 @@ SYSCALL_DEFINE5(move_mount,
+@@ -4146,6 +4409,13 @@ SYSCALL_DEFINE5(move_mount,
  	path_put(&to_path);
  out_from:
  	path_put(&from_path);
@@ -1075,7 +1076,7 @@ index 08d502aae6f9..14ea2d96d200 100644
  	return ret;
  }
  
-@@ -5048,3 +5318,37 @@ static int __init init_fs_namespace_sysctls(void)
+@@ -5060,3 +5330,37 @@ static int __init init_fs_namespace_sysctls(void)
  fs_initcall(init_fs_namespace_sysctls);
  
  #endif /* CONFIG_SYSCTL */
@@ -1114,7 +1115,7 @@ index 08d502aae6f9..14ea2d96d200 100644
 +}
 +#endif
 diff --git a/fs/notify/fdinfo.c b/fs/notify/fdinfo.c
-index 5c430736ec12..0a8bb91b1f73 100644
+index 26655572975d..26061fd96a87 100644
 --- a/fs/notify/fdinfo.c
 +++ b/fs/notify/fdinfo.c
 @@ -12,6 +12,9 @@
@@ -1155,7 +1156,7 @@ index 5c430736ec12..0a8bb91b1f73 100644
  		if (seq_has_overflowed(m))
  			break;
  	}
-@@ -73,7 +87,11 @@ static void show_mark_fhandle(struct seq_file *m, struct inode *inode)
+@@ -71,7 +85,11 @@ static void show_mark_fhandle(struct seq_file *m, struct inode *inode)
  
  #ifdef CONFIG_INOTIFY_USER
  
@@ -1167,7 +1168,7 @@ index 5c430736ec12..0a8bb91b1f73 100644
  {
  	struct inotify_inode_mark *inode_mark;
  	struct inode *inode;
-@@ -84,6 +102,36 @@ static void inotify_fdinfo(struct seq_file *m, struct fsnotify_mark *mark)
+@@ -82,6 +100,36 @@ static void inotify_fdinfo(struct seq_file *m, struct fsnotify_mark *mark)
  	inode_mark = container_of(mark, struct inotify_inode_mark, fsn_mark);
  	inode = igrab(fsnotify_conn_inode(mark->connector));
  	if (inode) {
@@ -1205,7 +1206,7 @@ index 5c430736ec12..0a8bb91b1f73 100644
  			   inode_mark->wd, inode->i_ino, inode->i_sb->s_dev,
  			   inotify_mark_user_mask(mark));
 diff --git a/fs/open.c b/fs/open.c
-index e658cdfd88b9..eb0499b61869 100644
+index f69210a888fd..2c80fd4b7db5 100644
 --- a/fs/open.c
 +++ b/fs/open.c
 @@ -34,6 +34,9 @@
@@ -1350,7 +1351,7 @@ index 4297287f6ca0..05500a675cbf 100644
  	show_fd_locks(m, file, files);
  	if (seq_has_overflowed(m))
 diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-index f70d8709cc4b..979b1dbe0d37 100644
+index ad94f3ee623d..116d5f657cda 100644
 --- a/fs/proc/task_mmu.c
 +++ b/fs/proc/task_mmu.c
 @@ -23,6 +23,9 @@
@@ -2116,7 +2117,7 @@ index 18edd57b5fe8..e2c695aa242c 100644
  }
  
 diff --git a/kernel/sys.c b/kernel/sys.c
-index 708ea5770e25..0ea301c70a62 100644
+index 74bed736f6a8..53dfbd5a2ef9 100644
 --- a/kernel/sys.c
 +++ b/kernel/sys.c
 @@ -1305,12 +1305,18 @@ static int override_release(char __user *release, size_t len)
