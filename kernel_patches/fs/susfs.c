@@ -1231,7 +1231,7 @@ int susfs_add_sus_map_loop(struct st_susfs_sus_map* __user user_info) {
 		return err;
 	}
 
-	err = kern_path(info.target_pathname, 0, &path);
+	err = kern_path(info.target_pathname, LOOKUP_FOLLOW, &path);
 	if (err) {
 		SUSFS_LOGE("Failed opening file '%s'\n", info.target_pathname);
 		return err;
@@ -1240,19 +1240,21 @@ int susfs_add_sus_map_loop(struct st_susfs_sus_map* __user user_info) {
 	tmp_buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
 	if (!tmp_buf) {
 		err = -ENOMEM;
+		SUSFS_LOGE("Failed allocating memory for tmp_buf\n");
 		goto out_path_put_path;
 	}
 
 	resolved_pathname = d_path(&path, tmp_buf, PAGE_SIZE);
-	if (!resolved_pathname) {
-		err = -ENOMEM;
+	if (IS_ERR(resolved_pathname)) {
+		err = PTR_ERR(resolved_pathname);
+		SUSFS_LOGE("d_path() failed\n");
 		goto out_kfree_tmp_buf;
 	}
 
 	list_for_each_entry_safe(cursor, temp, &LH_SUS_MAP_LOOP, list) {
 		if (unlikely(!strcmp(cursor->info.target_pathname, resolved_pathname))) {
 			err = -EINVAL;
-			SUSFS_LOGE("target_pathname: '%s' is already added to LH_SUS_MAP_LOOP\n", info.target_pathname);
+			SUSFS_LOGE("target_pathname: '%s' is already added to LH_SUS_MAP_LOOP\n", cursor->info.target_pathname);
 			goto out_kfree_tmp_buf;
 		}
 	}
@@ -1267,6 +1269,7 @@ int susfs_add_sus_map_loop(struct st_susfs_sus_map* __user user_info) {
 	new_list = kmalloc(sizeof(struct st_susfs_sus_map_list), GFP_KERNEL);
 	if (!new_list) {
 		err = -ENOMEM;
+		SUSFS_LOGE("Failed allocating memory for new_list\n");
 		goto out_spin_unlock_inode;
 	}
 	strncpy(new_list->info.target_pathname, resolved_pathname, SUSFS_MAX_LEN_PATHNAME - 1);
@@ -1290,16 +1293,23 @@ void susfs_run_sus_map_loop(uid_t uid) {
 	struct st_susfs_sus_map_list *cursor = NULL;
 	struct path path;
 	struct inode *inode;
+	int err = 0;
+
+	SUSFS_LOGI("Running susfs_run_sus_map_loop() for uid: %u\n", uid);
 
 	list_for_each_entry(cursor, &LH_SUS_MAP_LOOP, list) {
-		if (!kern_path(cursor->info.target_pathname, 0, &path)) {
+		err = kern_path(cursor->info.target_pathname, LOOKUP_FOLLOW, &path);
+		if (!err) {
 			inode = path.dentry->d_inode;
 			spin_lock(&inode->i_lock);
 			set_bit(AS_FLAGS_SUS_MAP, &inode->i_mapping->flags);
 			spin_unlock(&inode->i_lock);
 			path_put(&path);
 			SUSFS_LOGI("re-flag '%s' as SUS_MAP for uid: %u\n", cursor->info.target_pathname, uid);
+			continue;
 		}
+		SUSFS_LOGE("Failed flagging '%s' as SUS_MAP for uid: %u, err: %d\n",
+						cursor->info.target_pathname, uid, err);
 	}
 }
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_MAP
