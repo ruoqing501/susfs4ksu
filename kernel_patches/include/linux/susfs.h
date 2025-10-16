@@ -139,11 +139,6 @@ struct st_sus_su {
 struct st_susfs_sus_map {
 	char                             target_pathname[SUSFS_MAX_LEN_PATHNAME];
 };
-
-struct st_susfs_sus_map_list {
-	struct list_head                 list;
-	struct st_susfs_sus_map          info;
-};
 #endif
 
 /***********************/

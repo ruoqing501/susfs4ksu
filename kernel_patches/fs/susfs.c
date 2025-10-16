@@ -1183,7 +1183,6 @@ out:
 
 /* sus_map */
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
-static LIST_HEAD(LH_SUS_MAP_LOOP);
 int susfs_add_sus_map(struct st_susfs_sus_map* __user user_info) {
 	struct st_susfs_sus_map info;
 	struct path path;
