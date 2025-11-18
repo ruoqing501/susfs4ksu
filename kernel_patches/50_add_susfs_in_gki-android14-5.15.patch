@@ -543,7 +543,7 @@ index eeb9a3c5a048..1b504ce76431 100644
  	return filp;
  }
 diff --git a/fs/namespace.c b/fs/namespace.c
-index 9dd6f75d47d8..5b98b6e12512 100644
+index 9dd6f75d47d8..acb1c7d44687 100644
 --- a/fs/namespace.c
 +++ b/fs/namespace.c
 @@ -32,10 +32,39 @@
@@ -902,7 +902,7 @@ index 9dd6f75d47d8..5b98b6e12512 100644
  	return ret;
  }
  
-@@ -4654,3 +4919,59 @@ const struct proc_ns_operations mntns_operations = {
+@@ -4654,3 +4919,46 @@ const struct proc_ns_operations mntns_operations = {
  	.install	= mntns_install,
  	.owner		= mntns_owner,
  };
@@ -946,19 +946,6 @@ index 9dd6f75d47d8..5b98b6e12512 100644
 +	atomic64_add(1, &susfs_ksu_mounts);
 +
 +	unlock_mount_hash();
-+}
-+#endif
-+#ifdef CONFIG_KSU_SUSFS
-+bool susfs_is_mnt_devname_ksu(struct path *path) {
-+	struct mount *mnt;
-+
-+	if (path && path->mnt) {
-+		mnt = real_mount(path->mnt);
-+		if (mnt && mnt->mnt_devname && !strcmp(mnt->mnt_devname, "KSU")) {
-+			return true;
-+		}
-+	}
-+	return false;
 +}
 +#endif
 +
