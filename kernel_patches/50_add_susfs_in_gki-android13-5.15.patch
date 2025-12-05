@@ -81,7 +81,7 @@ index 4f25015aa534..17e9e15af730 100644
  		return NULL;
  	return dentry->d_fsdata;
 diff --git a/fs/exec.c b/fs/exec.c
-index b1b9db56a609..dbd6ae8e1315 100644
+index b1b9db56a609..815ed25ed204 100644
 --- a/fs/exec.c
 +++ b/fs/exec.c
 @@ -65,6 +65,9 @@
@@ -94,12 +94,13 @@ index b1b9db56a609..dbd6ae8e1315 100644
  
  #include <linux/uaccess.h>
  #include <asm/mmu_context.h>
-@@ -1891,6 +1894,15 @@ static int bprm_execve(struct linux_binprm *bprm,
+@@ -1891,6 +1894,16 @@ static int bprm_execve(struct linux_binprm *bprm,
  	return retval;
  }
  
 +#ifdef CONFIG_KSU_SUSFS
 +extern bool ksu_execveat_hook __read_mostly;
++extern bool susfs_is_boot_completed_triggered __read_mostly;
 +extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 +extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 +			void *envp, int *flags);
@@ -110,7 +111,7 @@ index b1b9db56a609..dbd6ae8e1315 100644
  static int do_execveat_common(int fd, struct filename *filename,
  			      struct user_arg_ptr argv,
  			      struct user_arg_ptr envp,
-@@ -1902,6 +1914,20 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -1902,6 +1915,20 @@ static int do_execveat_common(int fd, struct filename *filename,
  	if (IS_ERR(filename))
  		return PTR_ERR(filename);
  
@@ -119,7 +120,7 @@ index b1b9db56a609..dbd6ae8e1315 100644
 +		goto orig_flow;
 +	}
 +
-+	if (unlikely(ksu_execveat_hook)) {
++	if (unlikely(ksu_execveat_hook || !susfs_is_boot_completed_triggered)) {
 +		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
 +	} else if ((__ksu_is_allow_uid_for_current(current_uid().val))) {
 +		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
@@ -543,7 +544,7 @@ index ce97b60fe557..418f4a9080a7 100644
  	return filp;
  }
 diff --git a/fs/namespace.c b/fs/namespace.c
-index 18d2d37f1e2f..9dccdcf78f06 100644
+index 18d2d37f1e2f..4018191019c2 100644
 --- a/fs/namespace.c
 +++ b/fs/namespace.c
 @@ -32,10 +32,23 @@
@@ -559,7 +560,7 @@ index 18d2d37f1e2f..9dccdcf78f06 100644
  
 +#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 +extern bool susfs_is_current_ksu_domain(void);
-+extern bool susfs_is_boot_completed_triggered;
++extern bool susfs_is_boot_completed_triggered __read_mostly;
 +
 +static DEFINE_IDA(susfs_ksu_mnt_group_ida);
 +static atomic64_t susfs_ksu_mounts = ATOMIC64_INIT(0);
