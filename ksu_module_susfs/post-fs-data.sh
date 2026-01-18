@@ -106,3 +106,9 @@ ksu_susfs enable_avc_log_spoofing 1
 #ksu_susfs enable_avc_log_spoofing 0
 EOF
 
+#### Hide all sus mounts in this stage just to prevent zygote from seeing them ####
+## This should be applied only if you DO NOT have any zygisk enabled !! ##
+cat <<EOF >/dev/null
+ksu_susfs hide_sus_mnts_for_all_procs 1
+EOF
+
