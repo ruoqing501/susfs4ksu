@@ -69,8 +69,8 @@ ksu_susfs add_sus_map /system/fonts/Roboto-Regular.ttf
 ksu_susfs add_sus_map /system/fonts/RobotoStatic-Regular.ttf
 EOF
 
-#### Unhide all sus mounts after zygote is started ####
-## This should be applied only if you DO NOT have any zygisk enabled !! ##
+#### Unhide all sus mounts ####
+## This is up to you to unhide them all or not in this stage ##
 cat <<EOF >/dev/null
 ksu_susfs hide_sus_mnts_for_all_procs 0
 EOF
