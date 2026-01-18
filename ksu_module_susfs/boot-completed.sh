@@ -68,3 +68,10 @@ ksu_susfs add_sus_map /data/adb/modules/my_module/zygisk/arm64-v8a.so
 ksu_susfs add_sus_map /system/fonts/Roboto-Regular.ttf
 ksu_susfs add_sus_map /system/fonts/RobotoStatic-Regular.ttf
 EOF
+
+#### Unhide all sus mounts ####
+## This is up to you to unhide them all or not in this stage ##
+cat <<EOF >/dev/null
+ksu_susfs hide_sus_mnts_for_all_procs 0
+EOF
+
