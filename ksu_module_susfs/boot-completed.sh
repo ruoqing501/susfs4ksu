@@ -69,9 +69,9 @@ ksu_susfs add_sus_map /system/fonts/Roboto-Regular.ttf
 ksu_susfs add_sus_map /system/fonts/RobotoStatic-Regular.ttf
 EOF
 
-#### Unhide all sus mounts ####
-## This is up to you to unhide them all or not in this stage ##
+#### Unhide all sus mounts from /proc/self/[mounts|mountinfo|mountstat] for non-su processes ####
+## It is suggested to unhide it in this stage, and let kernel or zygisk to umount them for user processes, but this is up to you ##
 cat <<EOF >/dev/null
-ksu_susfs hide_sus_mnts_for_all_procs 0
+ksu_susfs hide_sus_mnts_for_non_su_procs 0
 EOF
 
